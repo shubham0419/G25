@@ -1,6 +1,7 @@
+const express = require("express");
+const router = express.Router();
 
-
-app.post("/user/create",async (req, res) => {
+router.post("/user/create",async (req, res) => {
   try {
     const {name,email,age} = req.body;
     // const user = await User.create({
@@ -25,7 +26,7 @@ app.post("/user/create",async (req, res) => {
   }
 });
 
-app.put("/user/update/:id",async(req,res)=>{
+router.put("/user/update/:id",async(req,res)=>{
   try {
     const {id} = req.params;
     const {name,age} = req.body;
@@ -36,3 +37,5 @@ app.put("/user/update/:id",async(req,res)=>{
     res.status(500).json({message:error.message})
   }
 })
+
+module.exports = router;

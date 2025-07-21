@@ -1,24 +1,6 @@
-const express = require("express");
-const connectDB = require("./db/connectDb");
-const User = require("./models/user.model");
-const app = express();
-const PORT = 4000;
-require("dotenv").config();
-// Routers
-const userRouter = require("./routes/user.route");
+const User = require("../models/user.model");
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// app.get("/",async (req, res) => {
-//   const user = await User.create({
-//     name:"user 1",
-//     email:"user1@gmail.com",
-//   })
-//   res.status(201).json({user});
-// });
-
-app.post("/user/create",async (req, res) => {
+const createUser = async (req, res) => {
   try {
     const {name,email,age} = req.body;
     // const user = await User.create({
@@ -41,9 +23,9 @@ app.post("/user/create",async (req, res) => {
   } catch (error) {
     res.status(500).json({message:error.message})
   }
-});
+}
 
-app.put("/user/update/:id",async(req,res)=>{
+const updateUser = async(req,res)=>{
   try {
     const {id} = req.params;
     const {name,age} = req.body;
@@ -53,9 +35,16 @@ app.put("/user/update/:id",async(req,res)=>{
   } catch (error) {
     res.status(500).json({message:error.message})
   }
-})
+}
 
-connectDB().then(()=>{
-  app.listen(PORT, () => console.log("Server running on port " + PORT));
-})
-.catch((error)=>console.log(error))
+
+const deleteUser = async (req,res)=>{
+  try {
+    const {id} = req.params;
+    await User.findByIdAndDelete(id);
+    res.status(200).json({message:"user deleted successfully"});
+  } catch (error) {
+    res.status(500).json({message:error.message})
+  }
+}
+module.exports = {createUser,updateUser,deleteUser}
