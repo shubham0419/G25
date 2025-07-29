@@ -39,6 +39,7 @@ h1{
   display: flex;
   justify-content: center;
 }
+
 #clear>button{
   padding: 5px;
   background-color: red;
@@ -46,6 +47,6 @@ h1{
 }
 
 .active{
-  background-color: green;
+  background-color: rgb(153, 255, 0);
   color: white;
 }
