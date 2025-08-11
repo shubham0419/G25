@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <h1>TaskMaster</h1>
+      <form id="task-form">
+        <input type="text" placeholder="Task..." name="task" />
+        <button>Add Task</button>
+      </form>
+      <div id="filter">
+        <button id="all" class="active">All</button>
+        <button id="active" >Active</button>
+        <button id="completed">Completed</button>
+      </div>
+      <div id="todo-container">
+        
+      </div>
+      <div id="clear">
+        <button>Clear Completed</button>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>
