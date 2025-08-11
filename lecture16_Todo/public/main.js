@@ -40,7 +40,6 @@ filterButtons.addEventListener("click",(e)=>{
 
 })
 
-
 async function getAllTodos(){
   let res = await axios.get("http://localhost:4000/todo/all");
   let todos = res.data.todos;
@@ -52,10 +51,30 @@ function renderTodos(todos){
   for(let todo of todos){
     const div = document.createElement("div");
     div.className = "todo";
-    div.innerHTML = `<h4>${todo.task}</h4> <div>
+    div.innerHTML = `<h4>${todo.task}</h4> <div id=${todo._id}>
       <button class="status">${todo.status?"Undo":"Complete"}</button>
       <button class="delete">delete</button>
     </div>`;
     todoContainer.prepend(div);
   }
 }
+
+// const todos = document.getElementsByClassName("todo");  this will not work as todo is not present in html at time of JS loads
+
+todoContainer.addEventListener("click",async (e)=>{
+  const btnClass = e.target.className;
+  // if btnclass is not delete or status return from function
+  if(btnClass != "delete" && btnClass != "status") return;
+
+  const todoId = e.target.parentElement.id;
+
+  if(btnClass=="delete"){
+    await axios.delete(`http://localhost:4000/todo/delete/${todoId}`)
+  }
+
+  if(btnClass=="status"){
+    await axios.put(`http://localhost:4000/todo/update/${todoId}`)
+  }
+
+  getAllTodos();
+})
