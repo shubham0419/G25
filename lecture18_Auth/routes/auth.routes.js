@@ -22,7 +22,22 @@ router.post("/signup",async (req,res)=>{
   }
 })
 
-
+router.post("/login",async (req,res)=>{
+  try {
+    const {email,password} = req.body;
+    const user = await User.findOne({email:email}).select("+password");
+    if(!user){
+      throw new Error("Invalid email or password")
+    }
+    const isMatched = await bcrypt.compare(password,user.password);
+    if(!isMatched){
+      throw new Error("Invalid email or password")
+    }
+    res.status(200).json({message:"user loggedin successfull"})
+  } catch (error) {
+    res.status(400).json({message:error.message})
+  }
+})
 
 module.exports = router;
 
