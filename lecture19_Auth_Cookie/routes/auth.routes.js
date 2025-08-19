@@ -4,6 +4,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const verifyUser = require("../middleware/verify.middleware");
+const verifyAdmin = require("../middleware/verifyAdmin.middleware");
 
 router.post("/signup",async (req,res)=>{
   try {
@@ -17,6 +18,26 @@ router.post("/signup",async (req,res)=>{
       name:name,
       email:email,
       password:hashPass
+    })
+    res.status(200).json({message:"user signup successfull",user})
+  } catch (error) {
+    res.status(500).json({message:error.message});
+  }
+})
+
+router.post("/admin/signup",async(req,res)=>{
+  try {
+    let {name,email,password} = req.body;
+    if(!name || !email || !password){
+      throw new Error("All fields are required");
+    }
+    const hashPass = await bcrypt.hash(password,10);
+
+    let user = await User.create({
+      name:name,
+      email:email,
+      password:hashPass,
+      role:"admin"
     })
     res.status(200).json({message:"user signup successfull",user})
   } catch (error) {
@@ -38,7 +59,9 @@ router.post("/login",async (req,res)=>{
     const token = jwt.sign({id:user._id,name:user.name,email:user.email},
       process.env.JWT_SECRET,{expiresIn:'1h',algorithm:"HS256"}
     )
-    res.status(200).json({message:"user loggedin successfull",token:token})
+    res.cookie("token",token,{httpOnly:true,secure:false,domain:"localhost",path:"/",maxAge:24*60*60*1000});
+    // res.status(200).json({message:"user loggedin successfull"})
+    res.status(200).json({message:"user loggedin successfull",token})
   } catch (error) {
     res.status(400).json({message:error.message})
   }
@@ -63,6 +86,15 @@ router.get("/check",verifyUser,async (req,res)=>{
     res.status(200).json({message:"welcome user",user:req.user})
   } catch (error) {
     res.status(400).json({message:error.message});
+  }
+})
+
+router.get("/info",verifyUser,verifyAdmin,async (req,res)=>{
+  try {
+    let users = await User.find({role:{$ne:"admin"}});
+    res.status(200).json({users});
+  } catch (error) {
+    res.status(400).json({message:error.message})
   }
 })
 
