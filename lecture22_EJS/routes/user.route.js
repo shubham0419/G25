@@ -2,7 +2,7 @@ const express = require("express");
 const verifyUser = require("../middleware/verify.middleware");
 const User = require("../models/user.model");
 const Product = require("../models/product.model");
-const Product = require("../models/product.model");
+const { verifyGoldUser, verifyPlatinumUser } = require("../middleware/verify.premium.middleware");
 const router = express.Router();
 
 const products = [
@@ -60,7 +60,7 @@ router.post("/package/buy",verifyUser,async(req,res)=>{
 })
 
 
-router.get("/gold/discount/:productId",async(req,res)=>{
+router.get("/gold/discount/:productId",verifyUser,verifyGoldUser,async(req,res)=>{
   try {
     const {productId} = req.params;
     const userId = req.user.id;
@@ -84,7 +84,7 @@ router.get("/gold/discount/:productId",async(req,res)=>{
 })
 
 
-router.get("/platinum/discount/:productId",async(req,res)=>{
+router.get("/platinum/discount/:productId",verifyUser,verifyPlatinumUser,async(req,res)=>{
   try {
     const {productId} = req.params;
     const userId = req.user.id;
