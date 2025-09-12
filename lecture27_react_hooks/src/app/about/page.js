@@ -15,6 +15,7 @@ const About = ()=>{
     setCount((prev)=>prev+1);
   }
 
+  
 
   return <>
     <Navbar setter={setCount}/>
