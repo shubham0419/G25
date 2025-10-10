@@ -14,6 +14,25 @@ router.post("/create",async (req,res)=>{
   }
 })
 
+router.get("/all",async (req,res)=>{
+  try {
+    // const allPosts = await prisma.post.findMany({
+    //   include:{
+    //     author:true,
+    //     comments:true
+    //   }
+    // });
+    const allPosts = await prisma.post.findMany({
+      include:{
+        author:true,
+        comments:{include:{author:true}}
+      }
+    });
+    res.status(200).json({allPosts})
+  } catch (error) {
+    res.status(400).json({message:error.message})
+  }
+})
 
 
 module.exports = router;

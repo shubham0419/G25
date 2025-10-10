@@ -4,9 +4,9 @@ const router = express.Router();
 
 router.post("/create",async (req,res)=>{
   try {
-    const {title,description,userId} = req.body;
-    const post = await prisma.post.create({
-      data:{title,description,authorId:userId}
+    const {comment,userId,postId} = req.body;
+    const post = await prisma.comment.create({
+      data:{comment,authorId:userId,postId}
     })
     res.status(201).json({post});
   } catch (error) {
