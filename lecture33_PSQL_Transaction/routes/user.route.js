@@ -61,7 +61,7 @@ router.post("/transfer",async(req,res)=>{
         where:{id:receiverId},
         data:{balance:{increment:amount}}
       })
-
+ 
       // step 4 -> tranction table enry (history)
       const trns = await tx.transaction.create({
         data:{amount,senderId,receiverId}
