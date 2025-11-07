@@ -4,42 +4,89 @@ const http = require("http");
 const cors = require("cors");
 const server = http.createServer(app);
 const socket = require("socket.io");
+const {v4:uuid} = require("uuid");
 const io = socket(server,{
   cors:{
     origin:"http://localhost:3000",
   }
 });
-const PORT = 5000;
+const PORT = 4000;
 const path = require("path");
 
-app.use(cors({
-  origin:"http://localhost:3000",
-  methods:"POST, GET"
-}))
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname,"public")))
 
+//{ 
+// "username":"socket.id"
+// "username2":socket.id
+// }
 const Users = {};
 
 //  post - > {
-  // author  -> user
+  // id.  ->.  
+  // author  -> username
   // content  ->string
-  // likes -> [user]
-  // createdAt -> date 
+  // likes -> [username]
+  // createdAt -> date
 // }
-const posts = []
+let Posts = []
 
 io.on("connection",(client)=>{
   console.log("User 1 connected -> ",client.id);
   
-  client.on("register",(userName)=>{
-    Users[userName] = client.id
+  // register user
+  client.on("register",(username)=>{
+    Users[username] = socket.id
   })
+  
+})
+
+app.post("/post/create",async (req,res)=>{
+  try {
+    const {username,content} = req.body;
+    const post = {
+      id:uuid(),
+      author:username,
+      content,
+      likes:[],
+      createdAt: new Date()
+    }
+    Posts.unshift(post);
+    res.status(201).json({posts:Posts})
+  } catch (error) {
+    res.status(401).json({message:error.message})
+  }
+})
+
+app.get("/post/all",async (req,res)=>{
+  res.status(200).json({posts:Posts})
+})
+
+app.post("/post/like/:id/:username",(req,res)=>{
+  try {
+    const {id,username} = req.params;
+    // [post,post,updated post, post ,post]
+    Posts = Posts.map((post)=>{
+      if(post.id == id ){
+        if(post.likes.includes(username)){
+          throw new Error("alreday liked the post");
+        }
+        post.likes.push(username);
+      }
+      return post;
+    })
+    res.status(200).json({message:"post updated successfully"})
+  } catch (error) {
+    res.status(401).json({message:error.message})
+  }
 })
 
 app.get("/", (req, res) => {
   res.send("server running");
 });
+
+
 
 server.listen(PORT, () => console.log("Server running on port " + PORT));
