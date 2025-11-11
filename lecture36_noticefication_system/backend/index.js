@@ -31,14 +31,20 @@ const Users = {};
   // likes -> [username]
   // createdAt -> date
 // }
-let Posts = []
+let Posts = [];
+
+
+// tasks --------
+// 1. real time likes update on posts
+// 2. real time posts update on posts
+// 3. user get notification when someone likes their post
 
 io.on("connection",(client)=>{
   console.log("User 1 connected -> ",client.id);
   
   // register user
   client.on("register",(username)=>{
-    Users[username] = socket.id
+    Users[username] = client.id
   })
   
 })
@@ -54,6 +60,7 @@ app.post("/post/create",async (req,res)=>{
       createdAt: new Date()
     }
     Posts.unshift(post);
+    io.emit("post update",Posts);
     res.status(201).json({posts:Posts})
   } catch (error) {
     res.status(401).json({message:error.message})
@@ -64,19 +71,34 @@ app.get("/post/all",async (req,res)=>{
   res.status(200).json({posts:Posts})
 })
 
+
+// let obj = {
+// "shubham":"skhjdfbwehijfbvweikbrkb"
+// }
+
+// obj["shubham"] -> socketId
+
 app.post("/post/like/:id/:username",(req,res)=>{
   try {
     const {id,username} = req.params;
     // [post,post,updated post, post ,post]
+    let userPost;
     Posts = Posts.map((post)=>{
       if(post.id == id ){
         if(post.likes.includes(username)){
           throw new Error("alreday liked the post");
         }
+        userPost = post;
         post.likes.push(username);
       }
       return post;
     })
+
+    if(Users[userPost.author] && username != userPost.author){
+      io.to(Users[userPost.author]).emit("notice",`${username} liked your post ${userPost.content}`)
+    }
+    io.emit("post update",Posts);
+    
     res.status(200).json({message:"post updated successfully"})
   } catch (error) {
     res.status(401).json({message:error.message})
