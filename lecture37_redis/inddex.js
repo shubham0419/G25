@@ -50,4 +50,48 @@ app.get("/sets",async (req,res)=>{
   }
 })
 
+// JSON
+app.get("/json",async (req,res)=>{
+  try {
+    const jsonData = {
+      name:"shubham",
+      val:25,
+    }
+    const res1 = await client.set("mydata:1",JSON.stringify(jsonData));
+    
+    const data = await client.get("mydata:1");
+    const realData = JSON.parse(data);
+    res.json({realData});
+  } catch (error) {
+    console.log(error);
+  }
+})
+
+// api architecture with redis
+app.get("/arch",async (req,res)=>{
+  try {
+    // 1. to check data in redis
+    const data = await client.get("archData:1");
+    if(data){
+      return res.json({data:JSON.parse(data)});
+    }
+
+    // 2. if !data then find from DB
+    //  ..... feth data from DB
+
+    // 3. Store the data from DB into redis
+    const res1 = await client.set("archData:1",JSON.stringify({name:"shubham",val:1}))
+
+    // 4. Set an expiery on data in redis in seconds
+    await client.expire("archData:1",7)
+
+    res.json({data:"fetched data from DB"});
+  } catch (error) {
+    console.log(error);
+  }
+})
+
+
+
+
 app.listen(PORT, () => console.log("Server running on port " + PORT));
