@@ -16,13 +16,13 @@ export default function Home() {
 
   // socket client initialise
   useEffect(()=>{
-    const newSocket = io("https://g25.vercel.app/");
+    const newSocket = io("https://g25-app.onrender.com/");
     setSocket(newSocket);
   },[])
 
   const gettAllPosts = async ()=>{
     if(isLoggenIn){
-      let res = await axios.get("https://g25.vercel.app/post/all");
+      let res = await axios.get("https://g25-app.onrender.com/post/all");
       setPosts(res.data.posts);
     }
   }
@@ -79,7 +79,7 @@ export default function Home() {
       username,
       content
     }
-    let res = await axios.post("https://g25.vercel.app/post/create",payload);
+    let res = await axios.post("https://g25-app.onrender.com/post/create",payload);
     if(res.status==201){
       setRefresh(prev=>prev+1);
     }
@@ -87,7 +87,7 @@ export default function Home() {
 
   const handlePostLike = async (id)=>{
     try {
-      let res = await axios.post(`https://g25.vercel.app/post/like/${id}/${username}`);
+      let res = await axios.post(`https://g25-app.onrender.com/post/like/${id}/${username}`);
       if(res.status==200){
         setRefresh(prev => prev+1);
       } 
